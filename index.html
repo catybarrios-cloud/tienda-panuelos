@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tienda de Pañuelos | Concepción, Chile</title>
+  <meta name="description" content="Pañuelos exclusivos en Concepción, Chile. Colección Premium 90×90 cm y Clásica 65×65 cm. Despacho a todo Chile por Blue Express. Pago con tarjeta de crédito o débito." />
+  <meta property="og:title" content="Tienda de Pañuelos · Concepción, Chile" />
+  <meta property="og:description" content="Dos colecciones únicas de pañuelos. Modelos exclusivos con despacho a todo Chile." />
+  <meta property="og:type" content="website" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     /* ─── Variables ─── */
@@ -125,7 +129,8 @@
 
     /* ─── Hero ─── */
     .hero {
-      background: linear-gradient(135deg, #F0E6DC 0%, #EDD5C4 50%, #F5EDE0 100%);
+      background: linear-gradient(135deg, rgba(42,26,18,0.45) 0%, rgba(42,26,18,0.30) 100%),
+                  url('imagenes/portada.jpg') center top / cover no-repeat;
       padding: 80px 24px;
       text-align: center;
       position: relative;
@@ -150,8 +155,8 @@
     .hero-content { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
     .hero-label {
       display: inline-block;
-      background: var(--blush);
-      color: var(--terracotta);
+      background: rgba(255,255,255,0.18);
+      color: #fff;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.1em;
@@ -164,13 +169,14 @@
       font-family: 'Playfair Display', serif;
       font-size: clamp(2.2rem, 5vw, 3.6rem);
       line-height: 1.15;
-      color: var(--dark);
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.3);
       margin-bottom: 20px;
     }
-    .hero h1 em { color: var(--terracotta); font-style: italic; }
+    .hero h1 em { color: #F5C8B0; font-style: italic; }
     .hero p {
       font-size: 1.05rem;
-      color: var(--medium);
+      color: rgba(255,255,255,0.90);
       max-width: 480px;
       margin: 0 auto 36px;
       line-height: 1.7;
@@ -311,7 +317,7 @@
 
     .product-img-wrap {
       position: relative;
-      aspect-ratio: 4/3;
+      aspect-ratio: 3/4;
       overflow: hidden;
       background: var(--ivory);
     }
@@ -928,8 +934,8 @@
 <div class="trust-bar">
   <div class="trust-inner">
     <div class="trust-item"><span class="trust-icon">🚚</span> Despacho a todo Chile</div>
-    <div class="trust-item"><span class="trust-icon">📍</span> Entrega local en Concepción</div>
-    <div class="trust-item"><span class="trust-icon">💳</span> Pago con tarjeta o transferencia</div>
+    <div class="trust-item"><span class="trust-icon">📍</span> Despacho gratis en Concepción</div>
+    <div class="trust-item"><span class="trust-icon">💳</span> Pago con tarjeta de crédito o débito</div>
     <div class="trust-item"><span class="trust-icon">💬</span> Pedidos por WhatsApp e Instagram</div>
   </div>
 </div>
@@ -978,18 +984,18 @@
     <div class="info-grid">
       <div class="info-card">
         <div class="info-card-icon">📍</div>
-        <div class="info-card-title">Entrega Local</div>
-        <div class="info-card-text">Pedro de Valdivia, Lonco y Villuco. Coordinamos día y hora directamente contigo por WhatsApp.</div>
+        <div class="info-card-title">Despacho en Concepción</div>
+        <div class="info-card-text">Sin costo en Concepción. Coordinamos día y hora directamente contigo por WhatsApp.</div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">📦</div>
         <div class="info-card-title">Despacho a Domicilio</div>
-        <div class="info-card-text">Enviamos a todo Chile por Starken o Chilexpress. Tu pedido llega cuidadosamente empacado.</div>
+        <div class="info-card-text">Enviamos a todo Chile por Blue Express. Tu pedido llega cuidadosamente empacado.</div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">💳</div>
         <div class="info-card-title">Formas de pago</div>
-        <div class="info-card-text">Transferencia bancaria o tarjeta de crédito/débito vía MercadoPago. Seguro y simple.</div>
+        <div class="info-card-text">Tarjeta de crédito o débito vía MercadoPago. Seguro y simple.</div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">💬</div>
@@ -1031,7 +1037,7 @@
       <h4>Colecciones</h4>
       <ul class="footer-links">
         <li><a href="#catalogo">Colección Premium</a></li>
-        <li><a href="#catalogo">Colección Esenciales</a></li>
+        <li><a href="#catalogo">Colección Clásica</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -1099,8 +1105,9 @@
    */
   const CONFIG = {
     WHATSAPP_NUMBER: '56991593102',
-    INSTAGRAM: 'tiendadepanuelos',          // ← Reemplaza con tu @ de Instagram
-    MERCADOPAGO_LINK: 'https://mpago.la/XXXXXXX', // ← Reemplaza con tu link de MercadoPago
+    INSTAGRAM: 'tiendadepanuelos',
+    MP_LINK_CLASICA:  'https://mpago.la/1disKha', // Link MercadoPago $7.500 (Colección Clásica)
+    MP_LINK_PREMIUM:  'https://mpago.la/2gLvM1i', // Link MercadoPago $9.500 (Colección Premium)
     BANK_NAME: 'BancoEstado',              // ← Reemplaza con tu banco
     BANK_ACCOUNT_TYPE: 'Cuenta corriente', // ← Tipo de cuenta
     BANK_ACCOUNT_NUMBER: 'XXXXXXXXXX',     // ← Número de cuenta
@@ -1136,8 +1143,8 @@
   ];
 
   const SHIPPING_OPTIONS = [
-    { id: 'local',   name: 'Entrega local',         desc: 'Pedro de Valdivia, Lonco o Villuco · Coordinamos contigo', price: 0,    icon: '📍' },
-    { id: 'courier', name: 'Starken / Chilexpress',  desc: 'Todo Chile · 3–5 días hábiles',                            price: 4990, icon: '📦' },
+    { id: 'concepcion', name: 'Despacho en Concepción', desc: 'Sin costo · Coordinamos día y hora contigo por WhatsApp', price: 0,    icon: '📍' },
+    { id: 'courier',    name: 'Blue Express',            desc: 'Todo Chile · 3–5 días hábiles',                          price: 4990, icon: '📦' },
   ];
 
   // Extras opcionales
@@ -1295,13 +1302,13 @@
   /* ─── CHECKOUT ─── */
   let checkoutStep = 1;
   let selectedShipping = null;
-  let selectedPayment = null;
+  let selectedPayment = 'mp';
 
   function openCheckout() {
     toggleCart();
     checkoutStep = 1;
     selectedShipping = null;
-    selectedPayment = null;
+    selectedPayment = 'mp';
     selectedExtras = {};
     renderCheckoutStep();
     document.getElementById('checkoutModal').classList.add('open');
@@ -1416,7 +1423,7 @@
   function selectShipping(id) {
     selectedShipping = id;
     const fields = document.getElementById('address_fields');
-    if (fields) fields.style.display = id === 'local' ? 'none' : 'block';
+    if (fields) fields.style.display = id === 'concepcion' ? 'none' : 'block';
     document.querySelectorAll('.shipping-opt').forEach(el => {
       el.classList.toggle('selected', el.querySelector('input').value === id);
     });
@@ -1451,32 +1458,15 @@
         ${itemsHtml}
       </div>
       <div class="form-group">
-        <label>¿Cómo prefieres pagar?</label>
+        <label>Método de pago</label>
         <div class="payment-options">
-          <label class="payment-opt ${selectedPayment === 'mp' ? 'selected' : ''}" onclick="selectPayment('mp')">
-            <input type="radio" name="payment" value="mp">
+          <label class="payment-opt selected" onclick="selectPayment('mp')">
+            <input type="radio" name="payment" value="mp" checked>
             <div class="pay-icon">💳</div>
-            <div class="pay-label">Tarjeta / MercadoPago</div>
-            <div class="pay-sub">Crédito, débito o débito automático</div>
-          </label>
-          <label class="payment-opt ${selectedPayment === 'transfer' ? 'selected' : ''}" onclick="selectPayment('transfer')">
-            <input type="radio" name="payment" value="transfer">
-            <div class="pay-icon">🏦</div>
-            <div class="pay-label">Transferencia bancaria</div>
-            <div class="pay-sub">Envía comprobante por WhatsApp</div>
+            <div class="pay-label">Tarjeta de crédito o débito</div>
+            <div class="pay-sub">Pago seguro vía MercadoPago</div>
           </label>
         </div>
-      </div>
-      <div class="transfer-info ${selectedPayment === 'transfer' ? 'show' : ''}" id="transferInfo">
-        <p><strong>Banco:</strong> ${CONFIG.BANK_NAME}</p>
-        <p><strong>Tipo de cuenta:</strong> ${CONFIG.BANK_ACCOUNT_TYPE}</p>
-        <p><strong>Número:</strong> ${CONFIG.BANK_ACCOUNT_NUMBER}</p>
-        <p><strong>RUT:</strong> ${CONFIG.BANK_RUT}</p>
-        <p><strong>Titular:</strong> ${CONFIG.BANK_OWNER}</p>
-        <p><strong>Email:</strong> ${CONFIG.BANK_EMAIL}</p>
-        <p style="margin-top:10px;font-size:0.78rem;color:var(--terracotta)">
-          📲 Envía el comprobante por WhatsApp para confirmar tu pedido.
-        </p>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button class="btn-confirm btn-next" onclick="goStep3()">Confirmar pedido →</button>
@@ -1517,11 +1507,11 @@
     // Compose WhatsApp message
     const items = cart.map(i => `• ${i.name} x${i.qty} — ${fmtPrice(i.price * i.qty)}`).join('\n');
     const shippingLine = shipping ? `${shipping.name}: ${shippingCost === 0 ? 'Gratis' : fmtPrice(shippingCost)}` : '';
-    const paymentLine = selectedPayment === 'mp' ? 'Tarjeta / MercadoPago' : 'Transferencia bancaria';
+    const paymentLine = 'Tarjeta de crédito / débito vía MercadoPago';
     const wspMsg = encodeURIComponent(
       `🛍️ *Nuevo pedido — Tienda de Pañuelos*\n\n` +
       `👤 *Nombre:* ${name}\n📱 *Teléfono:* ${phone}\n` +
-      (address ? `📍 *Dirección:* ${address}, ${city}\n` : `📍 *Entrega:* Local (Pedro de Valdivia, Lonco o Villuco — coordinar)\n`) +
+      (address ? `📍 *Dirección:* ${address}, ${city}\n` : `📍 *Entrega:* Concepción (sin costo — coordinar por WhatsApp)\n`) +
       `\n📦 *Productos:*\n${items}\n` +
       (extras > 0 ? `🎁 Bolsa de regalo: ${fmtPrice(extras)}\n` : '') +
       `\n🚚 *Despacho:* ${shippingLine}` +
@@ -1543,28 +1533,26 @@
         <div class="oms-item"><span>Despacho (${shipping?.name})</span><span>${shippingCost === 0 ? 'Gratis' : fmtPrice(shippingCost)}</span></div>
         <div class="oms-total"><span>Total</span><span>${fmtPrice(total)}</span></div>
       </div>
-      ${selectedPayment === 'mp' ? `
+      ${selectedPayment === 'mp' ? (() => {
+        const hasClasica  = cart.some(i => i.collection === 'clasica');
+        const hasPremium  = cart.some(i => i.collection === 'premium');
+        const qtyClasica  = cart.filter(i => i.collection === 'clasica').reduce((s,i) => s + i.qty, 0);
+        const qtyPremium  = cart.filter(i => i.collection === 'premium').reduce((s,i) => s + i.qty, 0);
+        const noteClasica = qtyClasica > 1 ? ` (haz clic ${qtyClasica} veces, uno por pañuelo)` : '';
+        const notePremium = qtyPremium > 1 ? ` (haz clic ${qtyPremium} veces, uno por pañuelo)` : '';
+        const mpButtons = [
+          hasClasica  ? `<a href="${CONFIG.MP_LINK_CLASICA}" target="_blank" class="btn-confirm btn-mp" style="margin-top:10px">💳 Pagar $7.500 con MercadoPago${noteClasica}</a>` : '',
+          hasPremium  ? `<a href="${CONFIG.MP_LINK_PREMIUM}" target="_blank" class="btn-confirm btn-mp" style="margin-top:10px">💳 Pagar $9.500 con MercadoPago${notePremium}</a>` : '',
+        ].join('');
+        return `
         <p style="font-size:0.85rem;color:var(--medium);margin-bottom:16px;text-align:center;line-height:1.6;">
-          Primero envía tu pedido por WhatsApp, luego te pasamos el link de pago con tarjeta.
+          Primero envía tu pedido por WhatsApp y luego paga con el link de MercadoPago.
         </p>
         <a href="${wspUrl}" target="_blank" class="btn-confirm btn-wsp" onclick="confirmOrder()">
           💬 Enviar pedido por WhatsApp
         </a>
-        <a href="${CONFIG.MERCADOPAGO_LINK}?amount=${total}" target="_blank" class="btn-confirm btn-mp" style="margin-top:10px">
-          💳 Pagar con MercadoPago
-        </a>
-      ` : `
-        <div class="transfer-info show" style="margin-bottom:20px;">
-          <p><strong>Banco:</strong> ${CONFIG.BANK_NAME} · ${CONFIG.BANK_ACCOUNT_TYPE}</p>
-          <p><strong>Cuenta:</strong> ${CONFIG.BANK_ACCOUNT_NUMBER} · RUT ${CONFIG.BANK_RUT}</p>
-          <p><strong>Titular:</strong> ${CONFIG.BANK_OWNER}</p>
-          <p><strong>Monto exacto:</strong> <strong style="color:var(--terracotta)">${fmtPrice(total)}</strong></p>
-          <p style="margin-top:8px;font-size:0.78rem;color:var(--terracotta)">📲 Envía el comprobante por WhatsApp junto con tu pedido.</p>
-        </div>
-        <a href="${wspUrl}" target="_blank" class="btn-confirm btn-wsp" onclick="confirmOrder()">
-          💬 Enviar pedido por WhatsApp
-        </a>
-      `}
+        ${mpButtons}`;
+      })()}
       <button class="btn-confirm btn-back" style="margin-top:10px" onclick="goStep2()">← Volver</button>
     `;
   }
