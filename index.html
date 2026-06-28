@@ -1533,7 +1533,7 @@
         <div class="oms-item"><span>Despacho (${shipping?.name})</span><span>${shippingCost === 0 ? 'Gratis' : fmtPrice(shippingCost)}</span></div>
         <div class="oms-total"><span>Total</span><span>${fmtPrice(total)}</span></div>
       </div>
-      ${selectedPayment === 'mp' ? (() => {
+      ${(() => {
         const hasClasica  = cart.some(i => i.collection === 'clasica');
         const hasPremium  = cart.some(i => i.collection === 'premium');
         const qtyClasica  = cart.filter(i => i.collection === 'clasica').reduce((s,i) => s + i.qty, 0);
