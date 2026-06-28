@@ -1143,8 +1143,9 @@
   ];
 
   const SHIPPING_OPTIONS = [
-    { id: 'concepcion', name: 'Despacho en Concepción', desc: 'Sin costo · Coordinamos día y hora contigo por WhatsApp', price: 0,    icon: '📍' },
-    { id: 'courier',    name: 'Blue Express',            desc: 'Todo Chile · 3–5 días hábiles',                          price: 4990, icon: '📦' },
+    { id: 'concepcion', name: 'Despacho en Concepción',      desc: 'Sin costo · Coordinamos día y hora contigo por WhatsApp',              price: 0,    icon: '📍' },
+    { id: 'copec',      name: 'Retiro en Punto Blue Express', desc: 'Retiras en el punto más cercano a ti (Copec, farmacias y más) · Todo Chile · Más económico',    price: 2490, icon: '📌' },
+    { id: 'courier',    name: 'Despacho a domicilio Blue Express', desc: 'Te llega a la puerta de tu casa · Todo Chile · 3–5 días hábiles', price: 4990, icon: '📦' },
   ];
 
   // Extras opcionales
@@ -1424,6 +1425,18 @@
     selectedShipping = id;
     const fields = document.getElementById('address_fields');
     if (fields) fields.style.display = id === 'concepcion' ? 'none' : 'block';
+    // Adjust address label depending on shipping type
+    const addrLabel = document.querySelector('#address_fields label');
+    const addrInput = document.getElementById('f_address');
+    if (addrLabel && addrInput) {
+      if (id === 'copec') {
+        addrLabel.textContent = 'Punto Blue Express donde retirarás (opcional)';
+        addrInput.placeholder = 'Ej: Copec O\'Higgins, o déjalo en blanco y te ayudamos';
+      } else {
+        addrLabel.textContent = 'Dirección de despacho *';
+        addrInput.placeholder = 'Calle, número, sector';
+      }
+    }
     document.querySelectorAll('.shipping-opt').forEach(el => {
       el.classList.toggle('selected', el.querySelector('input').value === id);
     });
@@ -1505,7 +1518,11 @@
     const wspMsg = encodeURIComponent(
       `🛍️ *Nuevo pedido — Tienda de Pañuelos*\n\n` +
       `👤 *Nombre:* ${name}\n📱 *Teléfono:* ${phone}\n` +
-      (address ? `📍 *Dirección:* ${address}, ${city}\n` : `📍 *Entrega:* Concepción (sin costo — coordinar por WhatsApp)\n`) +
+      (selectedShipping === 'concepcion'
+        ? `📍 *Entrega:* Concepción (sin costo — coordinar por WhatsApp)\n`
+        : selectedShipping === 'copec'
+          ? `📌 *Retiro en Punto Blue Express* — ${city}${address ? ' · ' + address : ''}\n`
+          : `📍 *Dirección:* ${address}, ${city}\n`) +
       `\n📦 *Productos:*\n${items}\n` +
       (extras > 0 ? `🎁 Bolsa de regalo: ${fmtPrice(extras)}\n` : '') +
       `\n🚚 *Despacho:* ${shippingLine}` +
