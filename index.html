@@ -1457,16 +1457,10 @@
         <div class="oms-title">Resumen del pedido</div>
         ${itemsHtml}
       </div>
-      <div class="form-group">
-        <label>Método de pago</label>
-        <div class="payment-options">
-          <label class="payment-opt selected" onclick="selectPayment('mp')">
-            <input type="radio" name="payment" value="mp" checked>
-            <div class="pay-icon">💳</div>
-            <div class="pay-label">Tarjeta de crédito o débito</div>
-            <div class="pay-sub">Pago seguro vía MercadoPago</div>
-          </label>
-        </div>
+      <div style="background:rgba(184,92,60,0.07);border-radius:12px;padding:16px;text-align:center;margin-bottom:8px;">
+        <div style="font-size:1.3rem;margin-bottom:6px;">💳</div>
+        <div style="font-weight:600;color:var(--dark);margin-bottom:4px;">Pago con tarjeta de crédito o débito</div>
+        <div style="font-size:0.82rem;color:var(--medium);line-height:1.5;">Al enviar tu pedido por WhatsApp recibirás un link de pago personalizado con el total exacto.</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button class="btn-confirm btn-next" onclick="goStep3()">Confirmar pedido →</button>
@@ -1533,26 +1527,12 @@
         <div class="oms-item"><span>Despacho (${shipping?.name})</span><span>${shippingCost === 0 ? 'Gratis' : fmtPrice(shippingCost)}</span></div>
         <div class="oms-total"><span>Total</span><span>${fmtPrice(total)}</span></div>
       </div>
-      ${(() => {
-        const hasClasica  = cart.some(i => i.collection === 'clasica');
-        const hasPremium  = cart.some(i => i.collection === 'premium');
-        const qtyClasica  = cart.filter(i => i.collection === 'clasica').reduce((s,i) => s + i.qty, 0);
-        const qtyPremium  = cart.filter(i => i.collection === 'premium').reduce((s,i) => s + i.qty, 0);
-        const noteClasica = qtyClasica > 1 ? ` (haz clic ${qtyClasica} veces, uno por pañuelo)` : '';
-        const notePremium = qtyPremium > 1 ? ` (haz clic ${qtyPremium} veces, uno por pañuelo)` : '';
-        const mpButtons = [
-          hasClasica  ? `<a href="${CONFIG.MP_LINK_CLASICA}" target="_blank" class="btn-confirm btn-mp" style="margin-top:10px">💳 Pagar $7.500 con MercadoPago${noteClasica}</a>` : '',
-          hasPremium  ? `<a href="${CONFIG.MP_LINK_PREMIUM}" target="_blank" class="btn-confirm btn-mp" style="margin-top:10px">💳 Pagar $9.500 con MercadoPago${notePremium}</a>` : '',
-        ].join('');
-        return `
-        <p style="font-size:0.85rem;color:var(--medium);margin-bottom:16px;text-align:center;line-height:1.6;">
-          Primero envía tu pedido por WhatsApp y luego paga con el link de MercadoPago.
-        </p>
-        <a href="${wspUrl}" target="_blank" class="btn-confirm btn-wsp" onclick="confirmOrder()">
-          💬 Enviar pedido por WhatsApp
-        </a>
-        ${mpButtons}`;
-      })()}
+      <p style="font-size:0.85rem;color:var(--medium);margin-bottom:16px;text-align:center;line-height:1.6;">
+        Envía tu pedido por WhatsApp y te mandaremos un link de pago personalizado con el total exacto: <strong style="color:var(--terracotta)">${fmtPrice(total)}</strong>
+      </p>
+      <a href="${wspUrl}" target="_blank" class="btn-confirm btn-wsp" onclick="confirmOrder()">
+        💬 Enviar pedido por WhatsApp
+      </a>
       <button class="btn-confirm btn-back" style="margin-top:10px" onclick="goStep2()">← Volver</button>
     `;
   }
