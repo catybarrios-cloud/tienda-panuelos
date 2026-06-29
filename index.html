@@ -1304,6 +1304,8 @@
   let checkoutStep = 1;
   let selectedShipping = null;
   let selectedPayment = 'mp';
+  // Saved form values (persisted across step changes)
+  let savedName = '', savedPhone = '', savedAddress = '', savedCity = '', savedNotes = '';
 
   function openCheckout() {
     toggleCart();
@@ -1311,6 +1313,7 @@
     selectedShipping = null;
     selectedPayment = 'mp';
     selectedExtras = {};
+    savedName = ''; savedPhone = ''; savedAddress = ''; savedCity = ''; savedNotes = '';
     renderCheckoutStep();
     document.getElementById('checkoutModal').classList.add('open');
   }
@@ -1447,6 +1450,12 @@
     const phone = document.getElementById('f_phone')?.value?.trim();
     if (!name || !phone) { showToast('Por favor completa nombre y teléfono'); return; }
     if (!selectedShipping) { showToast('Elige cómo quieres recibir tu pedido'); return; }
+    // Save form values before DOM is replaced
+    savedName    = name;
+    savedPhone   = phone;
+    savedAddress = document.getElementById('f_address')?.value || '';
+    savedCity    = document.getElementById('f_city')?.value || '';
+    savedNotes   = document.getElementById('f_notes')?.value || '';
     checkoutStep = 2;
     renderCheckoutStep();
   }
@@ -1505,11 +1514,11 @@
     const total = cartTotal() + shippingCost + extras;
     const shipping = SHIPPING_OPTIONS.find(s => s.id === selectedShipping);
 
-    const name = document.getElementById('f_name')?.value || '';
-    const phone = document.getElementById('f_phone')?.value || '';
-    const address = document.getElementById('f_address')?.value || '';
-    const city = document.getElementById('f_city')?.value || '';
-    const notes = document.getElementById('f_notes')?.value || '';
+    const name    = savedName;
+    const phone   = savedPhone;
+    const address = savedAddress;
+    const city    = savedCity;
+    const notes   = savedNotes;
 
     // Compose WhatsApp message
     const items = cart.map(i => `• ${i.name} x${i.qty} — ${fmtPrice(i.price * i.qty)}`).join('\n');
