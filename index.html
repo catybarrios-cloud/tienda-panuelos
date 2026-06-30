@@ -1325,7 +1325,7 @@
   function renderCheckoutStep() {
     document.getElementById('modalTitle').textContent =
       checkoutStep === 1 ? '📦 Datos de entrega' :
-      checkoutStep === 2 ? '💳 Forma de pago' : '¡Pedido listo!';
+      checkoutStep === 2 ? '🧾 Resumen del pedido' : '💳 Confirmar y pagar';
 
     const body = document.getElementById('modalBody');
     if (checkoutStep === 1) body.innerHTML = renderStep1();
@@ -1482,7 +1482,7 @@
       <div style="background:rgba(184,92,60,0.07);border-radius:12px;padding:16px;text-align:center;margin-bottom:8px;">
         <div style="font-size:1.3rem;margin-bottom:6px;">💳</div>
         <div style="font-weight:600;color:var(--dark);margin-bottom:4px;">Pago con tarjeta de crédito o débito</div>
-        <div style="font-size:0.82rem;color:var(--medium);line-height:1.5;">Al enviar tu pedido por WhatsApp recibirás un link de pago personalizado con el total exacto.</div>
+        <div style="font-size:0.82rem;color:var(--medium);line-height:1.5;">Pagarás directamente con tarjeta en MercadoPago. Seguro, rápido y sin necesidad de escribirnos.</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button class="btn-confirm btn-next" onclick="goStep3()">Confirmar pedido →</button>
@@ -1520,30 +1520,15 @@
     const city    = savedCity;
     const notes   = savedNotes;
 
-    // Compose WhatsApp message
-    const items = cart.map(i => `• ${i.name} x${i.qty} — ${fmtPrice(i.price * i.qty)}`).join('\n');
-    const shippingLine = shipping ? `${shipping.name}: ${shippingCost === 0 ? 'Gratis' : fmtPrice(shippingCost)}` : '';
-    const paymentLine = 'Tarjeta de crédito / débito vía MercadoPago';
-    const wspMsg = encodeURIComponent(
-      `🛍️ *Nuevo pedido — Tienda de Pañuelos*\n\n` +
-      `👤 *Nombre:* ${name}\n📱 *Teléfono:* ${phone}\n` +
-      (selectedShipping === 'concepcion'
-        ? `📍 *Entrega:* Concepción (sin costo — coordinar por WhatsApp)\n`
-        : selectedShipping === 'copec'
-          ? `📌 *Retiro en Punto Blue Express* — ${city}${address ? ' · ' + address : ''}\n`
-          : `📍 *Dirección:* ${address}, ${city}\n`) +
-      `\n📦 *Productos:*\n${items}\n` +
-      (extras > 0 ? `🎁 Bolsa de regalo: ${fmtPrice(extras)}\n` : '') +
-      `\n🚚 *Despacho:* ${shippingLine}` +
-      `\n💳 *Pago:* ${paymentLine}` +
-      `\n💰 *Total:* ${fmtPrice(total)}` +
-      (notes ? `\n\n📝 *Notas:* ${notes}` : '')
-    );
-    const wspUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${wspMsg}`;
-
     const itemsSummary = cart.map(i => `
       <div class="oms-item"><span>${i.name} × ${i.qty}</span><span>${fmtPrice(i.price * i.qty)}</span></div>
     `).join('') + (extras > 0 ? `<div class="oms-item"><span>Bolsa de regalo 🎁</span><span>${fmtPrice(extras)}</span></div>` : '');
+
+    const addressLine = selectedShipping === 'concepcion'
+      ? `📍 Entrega en Concepción`
+      : selectedShipping === 'copec'
+        ? `📌 Retiro en Punto Blue Express${city ? ' · ' + city : ''}${address ? ' · ' + address : ''}`
+        : `📦 Despacho a domicilio · ${address}${city ? ', ' + city : ''}`;
 
     return `
       ${renderSteps(3)}
@@ -1553,24 +1538,56 @@
         <div class="oms-item"><span>Despacho (${shipping?.name})</span><span>${shippingCost === 0 ? 'Gratis' : fmtPrice(shippingCost)}</span></div>
         <div class="oms-total"><span>Total</span><span>${fmtPrice(total)}</span></div>
       </div>
-      <p style="font-size:0.85rem;color:var(--medium);margin-bottom:16px;text-align:center;line-height:1.6;">
-        Envía tu pedido por WhatsApp y te mandaremos un link de pago personalizado con el total exacto: <strong style="color:var(--terracotta)">${fmtPrice(total)}</strong>
-      </p>
-      <a href="${wspUrl}" target="_blank" class="btn-confirm btn-wsp" onclick="confirmOrder()">
-        💬 Enviar pedido por WhatsApp
-      </a>
+      <div style="background:rgba(184,92,60,0.07);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:0.83rem;color:var(--medium);line-height:1.7;">
+        <strong style="color:var(--dark);display:block;margin-bottom:4px;">📋 Datos de tu pedido</strong>
+        👤 ${name} · 📱 ${phone}<br>${addressLine}${notes ? `<br>📝 ${notes}` : ''}
+      </div>
+      <button class="btn-confirm btn-mp" onclick="pagarConMP()" id="btnPagar">
+        💳 Pagar ${fmtPrice(total)} con tarjeta
+      </button>
       <button class="btn-confirm btn-back" style="margin-top:10px" onclick="goStep2()">← Volver</button>
     `;
   }
 
-  function confirmOrder() {
-    setTimeout(() => {
-      cart = [];
-      selectedExtras = {};
-      updateCartUI();
-      closeCheckout();
-      showToast('¡Pedido enviado! Te contactaremos pronto 🎉');
-    }, 800);
+  async function pagarConMP() {
+    const btn = document.getElementById('btnPagar');
+    if (!btn) return;
+    btn.textContent = '⏳ Preparando pago...';
+    btn.disabled = true;
+
+    const shippingCost = SHIPPING_OPTIONS.find(s => s.id === selectedShipping)?.price || 0;
+    const shipping = SHIPPING_OPTIONS.find(s => s.id === selectedShipping);
+
+    try {
+      const response = await fetch('/api/crear-pago', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+          shippingName: shipping?.name || '',
+          shippingPrice: shippingCost,
+          extras: extrasTotal(),
+          customerName: savedName,
+          customerPhone: savedPhone,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.init_point) {
+        cart = [];
+        selectedExtras = {};
+        updateCartUI();
+        window.location.href = data.init_point;
+      } else {
+        throw new Error('Sin link de pago');
+      }
+    } catch (err) {
+      console.error(err);
+      btn.textContent = '💳 Pagar con tarjeta';
+      btn.disabled = false;
+      showToast('Error al conectar con MercadoPago. Intenta de nuevo.');
+    }
   }
 
   /* ─── UTILS ─── */
@@ -1592,6 +1609,19 @@
 
   /* ─── INIT ─── */
   renderProducts();
+  // Detectar retorno desde MercadoPago
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const pago = params.get('pago');
+    if (pago) {
+      history.replaceState({}, '', '/');
+      setTimeout(() => {
+        if (pago === 'ok')         showToast('¡Pago recibido! Gracias por tu compra 🎉');
+        else if (pago === 'error') showToast('El pago no se completó. Puedes intentar de nuevo.');
+        else if (pago === 'pendiente') showToast('Tu pago está en revisión. Te avisaremos pronto.');
+      }, 600);
+    }
+  })();
 </script>
 </body>
 </html>
