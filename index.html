@@ -1305,7 +1305,7 @@
   let selectedShipping = null;
   let selectedPayment = 'mp';
   // Saved form values (persisted across step changes)
-  let savedName = '', savedPhone = '', savedAddress = '', savedCity = '', savedNotes = '';
+  let savedName = '', savedPhone = '', savedAddress = '', savedComuna = '', savedCity = '', savedRegion = '', savedNotes = '';
 
   function openCheckout() {
     toggleCart();
@@ -1313,7 +1313,7 @@
     selectedShipping = null;
     selectedPayment = 'mp';
     selectedExtras = {};
-    savedName = ''; savedPhone = ''; savedAddress = ''; savedCity = ''; savedNotes = '';
+    savedName = ''; savedPhone = ''; savedAddress = ''; savedComuna = ''; savedCity = ''; savedRegion = ''; savedNotes = '';
     renderCheckoutStep();
     document.getElementById('checkoutModal').classList.add('open');
   }
@@ -1381,13 +1381,23 @@
         </div>
       </div>
       <div id="address_fields">
-        <div class="form-group">
-          <label>Dirección de despacho *</label>
+        <div class="form-group" id="address_group">
+          <label id="address_label">Dirección de despacho *</label>
           <input type="text" id="f_address" placeholder="Calle, número, sector" />
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Comuna *</label>
+            <input type="text" id="f_comuna" placeholder="Ej: Concepción" />
+          </div>
+          <div class="form-group">
+            <label>Ciudad *</label>
+            <input type="text" id="f_city" placeholder="Ej: Concepción" />
+          </div>
+        </div>
         <div class="form-group">
-          <label>Ciudad / Región *</label>
-          <input type="text" id="f_city" placeholder="Ciudad y región" />
+          <label>Región *</label>
+          <input type="text" id="f_region" placeholder="Ej: Biobío" />
         </div>
       </div>
       <div class="form-group">
@@ -1428,16 +1438,18 @@
     selectedShipping = id;
     const fields = document.getElementById('address_fields');
     if (fields) fields.style.display = id === 'concepcion' ? 'none' : 'block';
-    // Adjust address label depending on shipping type
-    const addrLabel = document.querySelector('#address_fields label');
+    const addrLabel = document.getElementById('address_label');
     const addrInput = document.getElementById('f_address');
+    const addrGroup = document.getElementById('address_group');
     if (addrLabel && addrInput) {
       if (id === 'copec') {
         addrLabel.textContent = 'Punto Blue Express donde retirarás (opcional)';
         addrInput.placeholder = 'Ej: Copec O\'Higgins, o déjalo en blanco y te ayudamos';
+        if (addrGroup) addrGroup.style.display = 'block';
       } else {
         addrLabel.textContent = 'Dirección de despacho *';
         addrInput.placeholder = 'Calle, número, sector';
+        if (addrGroup) addrGroup.style.display = 'block';
       }
     }
     document.querySelectorAll('.shipping-opt').forEach(el => {
@@ -1454,7 +1466,9 @@
     savedName    = name;
     savedPhone   = phone;
     savedAddress = document.getElementById('f_address')?.value || '';
+    savedComuna  = document.getElementById('f_comuna')?.value || '';
     savedCity    = document.getElementById('f_city')?.value || '';
+    savedRegion  = document.getElementById('f_region')?.value || '';
     savedNotes   = document.getElementById('f_notes')?.value || '';
     checkoutStep = 2;
     renderCheckoutStep();
@@ -1517,18 +1531,21 @@
     const name    = savedName;
     const phone   = savedPhone;
     const address = savedAddress;
+    const comuna  = savedComuna;
     const city    = savedCity;
+    const region  = savedRegion;
     const notes   = savedNotes;
 
     const itemsSummary = cart.map(i => `
       <div class="oms-item"><span>${i.name} × ${i.qty}</span><span>${fmtPrice(i.price * i.qty)}</span></div>
     `).join('') + (extras > 0 ? `<div class="oms-item"><span>Bolsa de regalo 🎁</span><span>${fmtPrice(extras)}</span></div>` : '');
 
+    const locationStr = [comuna, city, region].filter(Boolean).join(', ');
     const addressLine = selectedShipping === 'concepcion'
       ? `📍 Entrega en Concepción`
       : selectedShipping === 'copec'
-        ? `📌 Retiro en Punto Blue Express${city ? ' · ' + city : ''}${address ? ' · ' + address : ''}`
-        : `📦 Despacho a domicilio · ${address}${city ? ', ' + city : ''}`;
+        ? `📌 Retiro en Punto Blue Express${locationStr ? ' · ' + locationStr : ''}${address ? ' · ' + address : ''}`
+        : `📦 Despacho a domicilio · ${[address, locationStr].filter(Boolean).join(' · ')}`;
 
     return `
       ${renderSteps(3)}
