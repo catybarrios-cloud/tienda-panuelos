@@ -1380,6 +1380,17 @@
           <input type="tel" id="f_phone" placeholder="+569 XXXXXXXX" />
         </div>
       </div>
+      <div id="find_point_box" style="display:none;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:2px solid #c0d4f5;border-radius:14px;padding:14px 16px;margin-bottom:12px;">
+        <div style="font-weight:600;font-size:0.88rem;color:#1a3a6b;margin-bottom:8px;">📌 ¿Dónde está el punto más cercano?</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" onclick="buscarPuntoConGPS()" style="flex:1;min-width:140px;background:#1a73e8;color:white;border:none;border-radius:8px;padding:9px 12px;font-size:0.82rem;font-weight:600;cursor:pointer;">
+            📍 Usar mi ubicación
+          </button>
+          <a href="https://www.bluexpress.cl/puntos-de-blue-express/" target="_blank" style="flex:1;min-width:140px;background:white;color:#1a3a6b;border:2px solid #c0d4f5;border-radius:8px;padding:9px 12px;font-size:0.82rem;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">
+            🗺️ Ver todos los puntos
+          </a>
+        </div>
+      </div>
       <div id="address_fields">
         <div class="form-group" id="address_group">
           <label id="address_label">Dirección de despacho *</label>
@@ -1437,14 +1448,16 @@
   function selectShipping(id) {
     selectedShipping = id;
     const fields = document.getElementById('address_fields');
+    const findBox = document.getElementById('find_point_box');
     if (fields) fields.style.display = id === 'concepcion' ? 'none' : 'block';
+    if (findBox) findBox.style.display = id === 'copec' ? 'block' : 'none';
     const addrLabel = document.getElementById('address_label');
     const addrInput = document.getElementById('f_address');
     const addrGroup = document.getElementById('address_group');
     if (addrLabel && addrInput) {
       if (id === 'copec') {
-        addrLabel.textContent = 'Punto Blue Express donde retirarás (opcional)';
-        addrInput.placeholder = 'Ej: Copec O\'Higgins, o déjalo en blanco y te ayudamos';
+        addrLabel.textContent = 'Punto Blue Express elegido (opcional)';
+        addrInput.placeholder = 'Ej: Copec O\'Higgins — o déjalo en blanco y te ayudamos';
         if (addrGroup) addrGroup.style.display = 'block';
       } else {
         addrLabel.textContent = 'Dirección de despacho *';
@@ -1455,6 +1468,29 @@
     document.querySelectorAll('.shipping-opt').forEach(el => {
       el.classList.toggle('selected', el.querySelector('input').value === id);
     });
+  }
+
+  function buscarPuntoConGPS() {
+    if (!navigator.geolocation) {
+      window.open('https://www.google.com/maps/search/Blue+Express+punto+express+Chile/', '_blank');
+      return;
+    }
+    const btn = document.querySelector('#find_point_box button');
+    if (btn) { btn.textContent = '⏳ Obteniendo ubicación...'; btn.disabled = true; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        const url = `https://www.google.com/maps/search/Blue+Express/@${lat},${lng},14z`;
+        window.open(url, '_blank');
+        if (btn) { btn.textContent = '📍 Usar mi ubicación'; btn.disabled = false; }
+      },
+      () => {
+        // Fallback if user denies location
+        window.open('https://www.google.com/maps/search/Blue+Express+Chile/', '_blank');
+        if (btn) { btn.textContent = '📍 Usar mi ubicación'; btn.disabled = false; }
+      },
+      { timeout: 8000 }
+    );
   }
 
   function goStep2() {
