@@ -361,6 +361,8 @@
     }
     .tag-premium { background: rgba(200,137,58,0.9); color: white; }
     .tag-clasica { background: rgba(232,191,176,0.95); color: var(--terracotta); }
+    .badge-accesorios { background: linear-gradient(135deg, #8B6C42, #B8924E); color: white; }
+    .tag-accesorios { background: rgba(139,108,66,0.88); color: white; }
 
     .product-info { padding: 18px 20px 20px; }
     .product-name {
@@ -970,6 +972,17 @@
         <!-- JS inserts products -->
       </div>
     </div>
+
+    <!-- Accesorios -->
+    <div class="collection-block">
+      <div class="collection-header">
+        <div class="collection-badge badge-accesorios">💍 Accesorios</div>
+        <div class="collection-line"></div>
+      </div>
+      <div class="products-grid" id="accesoriosGrid">
+        <!-- JS inserts products -->
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1038,6 +1051,7 @@
       <ul class="footer-links">
         <li><a href="#catalogo">Colección Premium</a></li>
         <li><a href="#catalogo">Colección Clásica</a></li>
+        <li><a href="#catalogo">Accesorios</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -1140,6 +1154,13 @@
     { id: 10, collection: 'clasica', name: 'Pañuelo 10', desc: '65×65 cm · Manchas azules',         price: 7500, image: 'imagenes/modelo10.jpg', emoji: '💙' },
     { id: 11, collection: 'clasica', name: 'Pañuelo 11', desc: '65×65 cm · Cebra blanco y negro',   price: 7500, image: 'imagenes/modelo11.jpg', emoji: '🖤' },
     { id: 12, collection: 'clasica', name: 'Pañuelo 12', desc: '65×65 cm · Flores tropicales',      price: 7500, image: 'imagenes/modelo12.jpg', emoji: '🌺' },
+    // Accesorios
+    { id: 13, collection: 'accesorios', name: 'Aros Perla Dorada',   desc: 'Perla central con base circular dorada · Elegantes y versátiles', price: 7680, image: null, emoji: '⭕' },
+    { id: 14, collection: 'accesorios', name: 'Aros Marfil & Oro',   desc: 'Diseño cuadrado marfil con marco dorado · Sofisticados y modernos', price: 7680, image: null, emoji: '🟡' },
+    { id: 15, collection: 'accesorios', name: 'Aros Nudo de Oro',    desc: 'Forma orgánica trenzada en dorado mate · Con carácter y estilo',   price: 7680, image: null, emoji: '✨' },
+    { id: 16, collection: 'accesorios', name: 'Aros Argolla Doble',  desc: 'Argolla con textura y brillo dorado · Diseño minimalista y chic',  price: 7680, image: null, emoji: '💛' },
+    { id: 17, collection: 'accesorios', name: 'Aros Flor de Perlas', desc: 'Flor de perlas delicadas · Románticos y femeninos',                 price: 7680, image: null, emoji: '🌸' },
+    { id: 18, collection: 'accesorios', name: 'Pasador de Pañuelo',  desc: 'Perla con base cruzada dorada · Complemento perfecto para tu pañuelo', price: 5800, image: null, emoji: '💎' },
   ];
 
   const SHIPPING_OPTIONS = [
@@ -1164,8 +1185,14 @@
 
   /* ─── RENDER PRODUCTS ─── */
   function renderProducts() {
-    ['premium','clasica'].forEach(col => {
-      const grid = document.getElementById(col === 'premium' ? 'premiumGrid' : 'clasicaGrid');
+    const COLS = [
+      { id: 'premium',    gridId: 'premiumGrid',    tagClass: 'tag-premium',    tagLabel: '✦ Premium'   },
+      { id: 'clasica',    gridId: 'clasicaGrid',    tagClass: 'tag-clasica',    tagLabel: '🌿 Clásica'  },
+      { id: 'accesorios', gridId: 'accesoriosGrid', tagClass: 'tag-accesorios', tagLabel: '💍 Accesorio' },
+    ];
+    COLS.forEach(({ id: col, gridId, tagClass, tagLabel }) => {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
       grid.innerHTML = PRODUCTS.filter(p => p.collection === col).map(p => `
         <div class="product-card" id="card-${p.id}">
           <div class="product-img-wrap">
@@ -1176,8 +1203,8 @@
                    <div class="placeholder-num">${p.name}</div>
                  </div>`
             }
-            <div class="product-tag ${col === 'premium' ? 'tag-premium' : 'tag-clasica'}">
-              ${col === 'premium' ? '✦ Premium' : '🌿 Clásica'}
+            <div class="product-tag ${tagClass}">
+              ${tagLabel}
             </div>
           </div>
           <div class="product-info">
