@@ -327,6 +327,15 @@
       object-fit: cover;
       transition: transform 0.4s;
     }
+    /* Accesorios: imagen cuadrada, sin recortar */
+    .product-img-wrap.acc-img {
+      aspect-ratio: 1/1;
+      background: #fff;
+    }
+    .product-img-wrap.acc-img img {
+      object-fit: contain;
+      padding: 10px;
+    }
     .product-card:hover .product-img-wrap img { transform: scale(1.05); }
 
     /* Placeholder visual cuando no hay imagen */
@@ -1195,7 +1204,7 @@
       if (!grid) return;
       grid.innerHTML = PRODUCTS.filter(p => p.collection === col).map(p => `
         <div class="product-card" id="card-${p.id}">
-          <div class="product-img-wrap">
+          <div class="product-img-wrap${col === 'accesorios' ? ' acc-img' : ''}">
             ${p.image
               ? `<img src="${p.image}" alt="${p.name}" loading="lazy" />`
               : `<div class="product-placeholder" style="background: ${placeholderBg(p.id)}">
