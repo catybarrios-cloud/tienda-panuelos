@@ -1418,13 +1418,16 @@
       </div>
       <div id="find_point_box" style="display:none;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:2px solid #c0d4f5;border-radius:14px;padding:14px 16px;margin-bottom:12px;">
         <div style="font-weight:600;font-size:0.88rem;color:#1a3a6b;margin-bottom:8px;">📌 ¿Dónde está el punto más cercano?</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
           <button type="button" onclick="buscarPuntoConGPS()" style="flex:1;min-width:140px;background:#1a73e8;color:white;border:none;border-radius:8px;padding:9px 12px;font-size:0.82rem;font-weight:600;cursor:pointer;">
-            📍 Usar mi ubicación
+            📍 Buscar por mi ubicación
           </button>
-          <a href="https://www.bluexpress.cl/puntos-de-blue-express/" target="_blank" style="flex:1;min-width:140px;background:white;color:#1a3a6b;border:2px solid #c0d4f5;border-radius:8px;padding:9px 12px;font-size:0.82rem;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">
+          <a href="https://mapa-pickup.blue.cl/" target="_blank" style="flex:1;min-width:140px;background:white;color:#1a3a6b;border:2px solid #c0d4f5;border-radius:8px;padding:9px 12px;font-size:0.82rem;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">
             🗺️ Ver todos los puntos
           </a>
+        </div>
+        <div id="blue_map_container" style="display:none;border-radius:10px;overflow:hidden;border:1px solid #c0d4f5;">
+          <iframe id="blue_map_iframe" src="" width="100%" height="360" style="border:none;display:block;" allowfullscreen></iframe>
         </div>
       </div>
       <div id="address_fields">
@@ -1507,23 +1510,38 @@
   }
 
   function buscarPuntoConGPS() {
-    if (!navigator.geolocation) {
-      window.open('https://www.google.com/maps/search/Blue+Express+punto+express+Chile/', '_blank');
+    const mapContainer = document.getElementById('blue_map_container');
+    const iframe = document.getElementById('blue_map_iframe');
+    const btn = document.querySelector('#find_point_box button');
+
+    // Si ya está visible, solo scrolleamos a él
+    if (mapContainer.style.display !== 'none') {
+      mapContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       return;
     }
-    const btn = document.querySelector('#find_point_box button');
+
+    if (!navigator.geolocation) {
+      // Sin GPS: mostrar el mapa general
+      iframe.src = 'https://mapa-pickup.blue.cl/';
+      mapContainer.style.display = 'block';
+      return;
+    }
+
     if (btn) { btn.textContent = '⏳ Obteniendo ubicación...'; btn.disabled = true; }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
-        const url = `https://www.google.com/maps/search/Blue+Express/@${lat},${lng},14z`;
-        window.open(url, '_blank');
-        if (btn) { btn.textContent = '📍 Usar mi ubicación'; btn.disabled = false; }
+        // Mapa oficial Blue Express centrado en la ubicación del usuario
+        iframe.src = `https://mapa-pickup.blue.cl/?lat=${lat}&lng=${lng}`;
+        mapContainer.style.display = 'block';
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (btn) { btn.textContent = '📍 Buscar por mi ubicación'; btn.disabled = false; }
       },
       () => {
-        // Fallback if user denies location
-        window.open('https://www.google.com/maps/search/Blue+Express+Chile/', '_blank');
-        if (btn) { btn.textContent = '📍 Usar mi ubicación'; btn.disabled = false; }
+        // Si rechaza GPS, mostrar mapa general
+        iframe.src = 'https://mapa-pickup.blue.cl/';
+        mapContainer.style.display = 'block';
+        if (btn) { btn.textContent = '📍 Buscar por mi ubicación'; btn.disabled = false; }
       },
       { timeout: 8000 }
     );
