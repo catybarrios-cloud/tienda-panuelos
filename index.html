@@ -503,7 +503,8 @@
       justify-content: center;
       font-size: 1.8rem;
     }
-    .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .cart-item-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .cart-item-img img.acc { object-fit: contain; padding: 4px; background: #fff; }
     .cart-item-info { flex: 1; }
     .cart-item-name { font-weight: 600; font-size: 0.9rem; color: var(--dark); margin-bottom: 2px; }
     .cart-item-tag { font-size: 0.75rem; color: var(--muted); margin-bottom: 8px; }
@@ -1311,10 +1312,18 @@
     }
     body.innerHTML = cart.map(item => `
       <div class="cart-item">
-        <div class="cart-item-img">${item.emoji}</div>
+        <div class="cart-item-img">
+          ${item.image
+            ? `<img src="${item.image}" alt="${item.name}"${item.collection === 'accesorios' ? ' class="acc"' : ''}>`
+            : `<span>${item.emoji}</span>`}
+        </div>
         <div class="cart-item-info">
           <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-tag">${item.collection === 'premium' ? '✦ Premium · 90×90 cm' : '🌿 Clásica · 65×65 cm'}</div>
+          <div class="cart-item-tag">${
+            item.collection === 'premium'    ? '✦ Premium · 90×90 cm' :
+            item.collection === 'clasica'    ? '🌿 Clásica · 65×65 cm' :
+                                               '💍 Accesorio'
+          }</div>
           <div class="cart-item-controls">
             <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
             <span class="qty-num">${item.qty}</span>
