@@ -503,6 +503,17 @@
       justify-content: center;
       font-size: 1.8rem;
     }
+    /* ── Carrusel de fotos ── */
+    .carousel-track { display: flex; transition: transform 0.35s ease; width: 100%; height: 100%; }
+    .carousel-track img { min-width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; }
+    .carousel-track img.acc { object-fit: contain; padding: 10px; background: #fff; }
+    .carousel-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 2; }
+    .carousel-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.55); cursor: pointer; border: 1.5px solid rgba(255,255,255,0.8); transition: background 0.2s; }
+    .carousel-dot.active { background: #fff; }
+    .carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.75); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 1rem; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+    .carousel-arrow:hover { background: #fff; }
+    .carousel-prev { left: 6px; }
+    .carousel-next { right: 6px; }
     .cart-item-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
     .cart-item-img img.acc { object-fit: contain; padding: 4px; background: #fff; }
     .cart-item-info { flex: 1; }
@@ -1165,11 +1176,11 @@
     { id: 11, collection: 'clasica', name: 'Cebra',         desc: '65×65 cm · Cebra blanco y negro',  price: 7500, image: 'imagenes/modelo11.jpg', emoji: '🖤' },
     { id: 12, collection: 'clasica', name: 'Paraíso',       desc: '65×65 cm · Flores tropicales',     price: 7500, image: 'imagenes/modelo12.jpg', emoji: '🌺' },
     // Accesorios
-    { id: 13, collection: 'accesorios', name: 'Aros Perla Dorada',   desc: 'Perla central con base circular dorada · Elegantes y versátiles', price: 4500, image: 'imagenes/aro1.jpg', emoji: '⭕' },
-    { id: 14, collection: 'accesorios', name: 'Aros Marfil & Oro',   desc: 'Diseño cuadrado marfil con marco dorado · Sofisticados y modernos', price: 4500, image: 'imagenes/aro3.jpg', emoji: '🟡' },
-    { id: 15, collection: 'accesorios', name: 'Aros Nudo de Oro',    desc: 'Forma orgánica trenzada en dorado mate · Con carácter y estilo',   price: 4500, image: 'imagenes/aro4.jpg', emoji: '✨' },
-    { id: 16, collection: 'accesorios', name: 'Aros Argolla Doble',  desc: 'Argolla con textura y brillo dorado · Diseño minimalista y chic',  price: 4500, image: 'imagenes/aro5.jpg', emoji: '💛' },
-    { id: 17, collection: 'accesorios', name: 'Aros Flor de Perlas', desc: 'Flor de perlas delicadas · Románticos y femeninos',                 price: 4500, image: 'imagenes/aro2.jpg', emoji: '🌸' },
+    { id: 13, collection: 'accesorios', name: 'Aros Perla Dorada',   desc: 'Perla central con base circular dorada · Elegantes y versátiles', price: 4500, image: 'imagenes/aro1.jpg', image2: null,                    emoji: '⭕' },
+    { id: 14, collection: 'accesorios', name: 'Aros Marfil & Oro',   desc: 'Diseño cuadrado marfil con marco dorado · Sofisticados y modernos', price: 4500, image: 'imagenes/aro3.jpg', image2: 'imagenes/aro3_m.jpg', emoji: '🟡' },
+    { id: 15, collection: 'accesorios', name: 'Aros Nudo de Oro',    desc: 'Forma orgánica trenzada en dorado mate · Con carácter y estilo',   price: 4500, image: 'imagenes/aro4.jpg', image2: 'imagenes/aro4_m.jpg', emoji: '✨' },
+    { id: 16, collection: 'accesorios', name: 'Aros Argolla Doble',  desc: 'Argolla con textura y brillo dorado · Diseño minimalista y chic',  price: 4500, image: 'imagenes/aro5.jpg', image2: 'imagenes/aro5_m.jpg', emoji: '💛' },
+    { id: 17, collection: 'accesorios', name: 'Aros Flor de Perlas', desc: 'Flor de perlas delicadas · Románticos y femeninos',                 price: 4500, image: 'imagenes/aro2.jpg', image2: 'imagenes/aro2_m.jpg', emoji: '🌸' },
     { id: 18, collection: 'accesorios', name: 'Pasador de Pañuelo',  desc: 'Perla con base cruzada dorada · Complemento perfecto para tu pañuelo', price: 4800, image: 'imagenes/pasador1.jpg', emoji: '💎' },
   ];
 
@@ -1193,6 +1204,21 @@
     return '$' + n.toLocaleString('es-CL');
   }
 
+  /* ─── CAROUSEL ─── */
+  const carouselState = {};
+  function goSlide(id, idx, relative) {
+    const track = document.getElementById('track-' + id);
+    if (!track) return;
+    const dots = document.querySelectorAll('#wrap-' + id + ' .carousel-dot');
+    const total = track.children.length;
+    let cur = carouselState[id] || 0;
+    if (relative) cur = (cur + idx + total) % total;
+    else cur = ((idx % total) + total) % total;
+    carouselState[id] = cur;
+    track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === cur); });
+  }
+
   /* ─── RENDER PRODUCTS ─── */
   function renderProducts() {
     const COLS = [
@@ -1206,12 +1232,27 @@
       grid.innerHTML = PRODUCTS.filter(p => p.collection === col).map(p => `
         <div class="product-card" id="card-${p.id}">
           <div class="product-img-wrap${col === 'accesorios' ? ' acc-img' : ''}">
-            ${p.image
-              ? `<img src="${p.image}" alt="${p.name}" loading="lazy" />`
-              : `<div class="product-placeholder" style="background: ${placeholderBg(p.id)}">
-                   <div class="placeholder-icon">${p.emoji}</div>
-                   <div class="placeholder-num">${p.name}</div>
+            ${p.image2
+              ? `<div id="wrap-${p.id}" style="position:relative;width:100%;height:100%;overflow:hidden"
+                     ontouchstart="this.dataset.sx=event.touches[0].clientX"
+                     ontouchend="(function(el,id){var dx=+el.dataset.sx-event.changedTouches[0].clientX;if(Math.abs(dx)>40)goSlide(id,dx>0?1:-1,true)})(this,${p.id})">
+                   <div class="carousel-track" id="track-${p.id}">
+                     <img src="${p.image}" alt="${p.name}" loading="lazy" class="acc" />
+                     <img src="${p.image2}" alt="${p.name} modelo" loading="lazy" />
+                   </div>
+                   <button class="carousel-arrow carousel-prev" onclick="event.stopPropagation();goSlide(${p.id},-1,true)">&#8249;</button>
+                   <button class="carousel-arrow carousel-next" onclick="event.stopPropagation();goSlide(${p.id},1,true)">&#8250;</button>
+                   <div class="carousel-dots">
+                     <div class="carousel-dot active" onclick="goSlide(${p.id},0)"></div>
+                     <div class="carousel-dot" onclick="goSlide(${p.id},1)"></div>
+                   </div>
                  </div>`
+              : p.image
+                ? `<img src="${p.image}" alt="${p.name}" loading="lazy" />`
+                : `<div class="product-placeholder" style="background: ${placeholderBg(p.id)}">
+                     <div class="placeholder-icon">${p.emoji}</div>
+                     <div class="placeholder-num">${p.name}</div>
+                   </div>`
             }
             <div class="product-tag ${tagClass}">
               ${tagLabel}
