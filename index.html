@@ -1391,7 +1391,7 @@
   let selectedShipping = null;
   let selectedPayment = 'mp';
   // Saved form values (persisted across step changes)
-  let savedName = '', savedPhone = '', savedAddress = '', savedComuna = '', savedCity = '', savedRegion = '', savedNotes = '';
+  let savedName = '', savedPhone = '', savedEmail = '', savedAddress = '', savedComuna = '', savedCity = '', savedRegion = '', savedNotes = '';
 
   function openCheckout() {
     toggleCart();
@@ -1399,7 +1399,7 @@
     selectedShipping = null;
     selectedPayment = 'mp';
     selectedExtras = {};
-    savedName = ''; savedPhone = ''; savedAddress = ''; savedComuna = ''; savedCity = ''; savedRegion = ''; savedNotes = '';
+    savedName = ''; savedPhone = ''; savedEmail = ''; savedAddress = ''; savedComuna = ''; savedCity = ''; savedRegion = ''; savedNotes = '';
     renderCheckoutStep();
     document.getElementById('checkoutModal').classList.add('open');
   }
@@ -1466,6 +1466,11 @@
           <input type="tel" id="f_phone" placeholder="+569 XXXXXXXX" />
         </div>
       </div>
+      <div class="form-group">
+        <label>Correo electrónico *</label>
+        <input type="email" id="f_email" placeholder="tu@correo.com" />
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:3px;">Te enviaremos la confirmación del pedido aquí</div>
+      </div>
       <div id="find_point_box" style="display:none;background:linear-gradient(135deg,#f0f7ff,#e8f0fe);border:2px solid #c0d4f5;border-radius:14px;padding:14px 16px;margin-bottom:12px;">
         <div style="font-weight:600;font-size:0.88rem;color:#1a3a6b;margin-bottom:8px;">📌 ¿Dónde está el punto más cercano?</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
@@ -1485,7 +1490,7 @@
           <label id="address_label">Dirección de despacho *</label>
           <input type="text" id="f_address" placeholder="Calle, número, sector" />
         </div>
-        <div class="form-row">
+        <div class="form-row" id="location_row">
           <div class="form-group">
             <label>Comuna *</label>
             <input type="text" id="f_comuna" placeholder="Ej: Concepción" />
@@ -1495,7 +1500,7 @@
             <input type="text" id="f_city" placeholder="Ej: Concepción" />
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="region_group">
           <label>Región *</label>
           <input type="text" id="f_region" placeholder="Ej: Biobío" />
         </div>
@@ -1536,24 +1541,46 @@
 
   function selectShipping(id) {
     selectedShipping = id;
-    const fields = document.getElementById('address_fields');
-    const findBox = document.getElementById('find_point_box');
-    if (fields) fields.style.display = id === 'concepcion' ? 'none' : 'block';
+    const fields      = document.getElementById('address_fields');
+    const findBox     = document.getElementById('find_point_box');
+    const addrLabel   = document.getElementById('address_label');
+    const addrInput   = document.getElementById('f_address');
+    const addrGroup   = document.getElementById('address_group');
+    const locationRow = document.getElementById('location_row');
+    const regionGroup = document.getElementById('region_group');
+
+    // Always show address block
+    if (fields) fields.style.display = 'block';
     if (findBox) findBox.style.display = id === 'copec' ? 'block' : 'none';
-    const addrLabel = document.getElementById('address_label');
-    const addrInput = document.getElementById('f_address');
-    const addrGroup = document.getElementById('address_group');
-    if (addrLabel && addrInput) {
-      if (id === 'copec') {
-        addrLabel.textContent = 'Punto Blue Express elegido (opcional)';
-        addrInput.placeholder = 'Ej: Copec O\'Higgins — o déjalo en blanco y te ayudamos';
-        if (addrGroup) addrGroup.style.display = 'block';
-      } else {
-        addrLabel.textContent = 'Dirección de despacho *';
-        addrInput.placeholder = 'Calle, número, sector';
-        if (addrGroup) addrGroup.style.display = 'block';
-      }
+
+    if (id === 'concepcion') {
+      // Show only the street address — pre-fill city/region silently
+      if (addrLabel) addrLabel.textContent = 'Dirección en Concepción *';
+      if (addrInput) addrInput.placeholder = 'Calle, número, villa/barrio';
+      if (addrGroup) addrGroup.style.display = 'block';
+      if (locationRow) locationRow.style.display = 'none';
+      if (regionGroup) regionGroup.style.display = 'none';
+      // Pre-fill hidden location fields
+      const fc = document.getElementById('f_comuna');
+      const fci = document.getElementById('f_city');
+      const fr = document.getElementById('f_region');
+      if (fc) fc.value = 'Concepción';
+      if (fci) fci.value = 'Concepción';
+      if (fr) fr.value = 'Región del Biobío';
+    } else if (id === 'copec') {
+      if (addrLabel) addrLabel.textContent = 'Punto Blue Express elegido (opcional)';
+      if (addrInput) addrInput.placeholder = "Ej: Copec O'Higgins — o déjalo en blanco y te ayudamos";
+      if (addrGroup) addrGroup.style.display = 'block';
+      if (locationRow) locationRow.style.display = 'flex';
+      if (regionGroup) regionGroup.style.display = 'block';
+    } else {
+      if (addrLabel) addrLabel.textContent = 'Dirección de despacho *';
+      if (addrInput) addrInput.placeholder = 'Calle, número, sector';
+      if (addrGroup) addrGroup.style.display = 'block';
+      if (locationRow) locationRow.style.display = 'flex';
+      if (regionGroup) regionGroup.style.display = 'block';
     }
+
     document.querySelectorAll('.shipping-opt').forEach(el => {
       el.classList.toggle('selected', el.querySelector('input').value === id);
     });
@@ -1598,14 +1625,20 @@
   }
 
   function goStep2() {
-    const name = document.getElementById('f_name')?.value?.trim();
+    const name  = document.getElementById('f_name')?.value?.trim();
     const phone = document.getElementById('f_phone')?.value?.trim();
+    const email = document.getElementById('f_email')?.value?.trim();
     if (!name || !phone) { showToast('Por favor completa nombre y teléfono'); return; }
+    if (!email || !email.includes('@')) { showToast('Por favor ingresa un correo válido para enviarte la confirmación'); return; }
     if (!selectedShipping) { showToast('Elige cómo quieres recibir tu pedido'); return; }
+    // Validate address for all shipping modes
+    const addr = document.getElementById('f_address')?.value?.trim();
+    if (!addr) { showToast('Por favor ingresa tu dirección'); return; }
     // Save form values before DOM is replaced
     savedName    = name;
     savedPhone   = phone;
-    savedAddress = document.getElementById('f_address')?.value || '';
+    savedEmail   = email;
+    savedAddress = addr;
     savedComuna  = document.getElementById('f_comuna')?.value || '';
     savedCity    = document.getElementById('f_city')?.value || '';
     savedRegion  = document.getElementById('f_region')?.value || '';
@@ -1697,7 +1730,7 @@
       </div>
       <div style="background:rgba(184,92,60,0.07);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:0.83rem;color:var(--medium);line-height:1.7;">
         <strong style="color:var(--dark);display:block;margin-bottom:4px;">📋 Datos de tu pedido</strong>
-        👤 ${name} · 📱 ${phone}<br>${addressLine}${notes ? `<br>📝 ${notes}` : ''}
+        👤 ${name} · 📱 ${phone} · ✉️ ${savedEmail}<br>${addressLine}${notes ? `<br>📝 ${notes}` : ''}
       </div>
       <button class="btn-confirm btn-mp" onclick="pagarConMP()" id="btnPagar">
         💳 Pagar ${fmtPrice(total)} con tarjeta
@@ -1726,6 +1759,7 @@
           extras: extrasTotal(),
           customerName: savedName,
           customerPhone: savedPhone,
+          customerEmail: savedEmail,
           customerAddress: savedAddress,
           customerComuna: savedComuna,
           customerCity: savedCity,
