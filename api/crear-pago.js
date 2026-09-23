@@ -152,7 +152,7 @@ module.exports = async function handler(req, res) {
         const addressParts = [customerAddress, customerComuna, customerCity, customerRegion].filter(Boolean);
         const addressLine = addressParts.length
           ? esc(addressParts.join(', '))
-          : '(Retiro en Concepción)';
+          : '(Sin dirección)';
 
         const html = `
           <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#333">

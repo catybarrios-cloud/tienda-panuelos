@@ -41,7 +41,7 @@ const PRODUCTS = [
 ];
 
 const SHIPPING_OPTIONS = [
-  { id: 'concepcion', name: 'Despacho en Concepción',      desc: 'Sin costo · Coordinamos día y hora contigo por WhatsApp',              price: 0,    icon: '📍' },
+  { id: 'concepcion', name: 'Despacho gratis en Pedro de Valdivia, Lonco y Villuco', desc: 'Solo en estos sectores · Coordinamos día y hora contigo por WhatsApp',              price: 0,    icon: '📍' },
   { id: 'copec',      name: 'Retiro en Punto Blue Express', desc: 'Retiras en el punto más cercano a ti (Copec, farmacias y más) · Todo Chile · Más económico',    price: 2490, icon: '📌' },
   { id: 'courier',    name: 'Despacho a domicilio Blue Express', desc: 'Te llega a la puerta de tu casa · Todo Chile · 3–5 días hábiles', price: 4990, icon: '📦' },
 ];

@@ -957,7 +957,6 @@
 <div class="trust-bar">
   <div class="trust-inner">
     <div class="trust-item"><span class="trust-icon">🚚</span> Despacho a todo Chile</div>
-    <div class="trust-item"><span class="trust-icon">📍</span> Despacho gratis en Concepción</div>
     <div class="trust-item"><span class="trust-icon">💳</span> Pago con tarjeta de crédito o débito</div>
     <div class="trust-item"><span class="trust-icon">💬</span> Pedidos por WhatsApp e Instagram</div>
   </div>
@@ -1018,8 +1017,8 @@
     <div class="info-grid">
       <div class="info-card">
         <div class="info-card-icon">📍</div>
-        <div class="info-card-title">Despacho en Concepción</div>
-        <div class="info-card-text">Sin costo en Concepción. Coordinamos día y hora directamente contigo por WhatsApp.</div>
+        <div class="info-card-title">Despacho gratis</div>
+        <div class="info-card-text">Sin costo en Pedro de Valdivia, Lonco y Villuco. Coordinamos día y hora directamente contigo por WhatsApp. Al resto de Concepción y de Chile enviamos por Blue Express.</div>
       </div>
       <div class="info-card">
         <div class="info-card-icon">📦</div>
@@ -1514,7 +1513,7 @@
 
     if (id === 'concepcion') {
       // Show only the street address — pre-fill city/region silently
-      if (addrLabel) addrLabel.textContent = 'Dirección en Concepción *';
+      if (addrLabel) addrLabel.textContent = 'Dirección en Pedro de Valdivia, Lonco o Villuco *';
       if (addrInput) addrInput.placeholder = 'Calle, número, villa/barrio';
       if (addrGroup) addrGroup.style.display = 'block';
       if (locationRow) locationRow.style.display = 'none';
@@ -1523,8 +1522,8 @@
       const fc = document.getElementById('f_comuna');
       const fci = document.getElementById('f_city');
       const fr = document.getElementById('f_region');
-      if (fc) fc.value = 'Concepción';
-      if (fci) fci.value = 'Concepción';
+      if (fc) fc.value = 'Pedro de Valdivia / Lonco / Villuco';
+      if (fci) fci.value = '';
       if (fr) fr.value = 'Región del Biobío';
     } else if (id === 'copec') {
       if (addrLabel) addrLabel.textContent = 'Punto Blue Express elegido (opcional)';
@@ -1674,7 +1673,7 @@
 
     const locationStr = [comuna, city, region].filter(Boolean).join(', ');
     const addressLine = selectedShipping === 'concepcion'
-      ? `📍 Entrega en Concepción`
+      ? `📍 Entrega gratis en Pedro de Valdivia, Lonco y Villuco`
       : selectedShipping === 'copec'
         ? `📌 Retiro en Punto Blue Express${locationStr ? ' · ' + locationStr : ''}${address ? ' · ' + address : ''}`
         : `📦 Despacho a domicilio · ${[address, locationStr].filter(Boolean).join(' · ')}`;
