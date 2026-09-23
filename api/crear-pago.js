@@ -1,5 +1,36 @@
 // Vercel Serverless Function — crea una preferencia de pago en MercadoPago y notifica por email
+const nodemailer = require('nodemailer');
 const { PRODUCTS, SHIPPING_OPTIONS, EXTRAS } = require('../catalogo.js');
+
+const STORE_EMAIL = 'catybarrios@gmail.com';
+
+// Envía un correo. Usa Gmail si están GMAIL_USER y GMAIL_APP_PASSWORD en Vercel
+// (puede enviar a cualquier cliente). Si no, usa Resend, que con el remitente de
+// prueba solo puede enviar a la dueña de la cuenta.
+async function sendEmail({ to, subject, html }) {
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+    });
+    await transporter.sendMail({
+      from: `Tienda de Pañuelos <${process.env.GMAIL_USER}>`,
+      replyTo: STORE_EMAIL,
+      to, subject, html,
+    });
+    return;
+  }
+  if (process.env.RESEND_API_KEY) {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from: 'Tienda Pañuelos <onboarding@resend.dev>', to: [to], subject, html }),
+    });
+  }
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -101,7 +132,7 @@ module.exports = async function handler(req, res) {
     }
 
     // ── Notificación por email ──────────────────────────────────────────
-    if (process.env.RESEND_API_KEY) {
+    if ((process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) || process.env.RESEND_API_KEY) {
       try {
         const fmt = (n) => '$' + Number(n).toLocaleString('es-CL');
         // Escapa lo que escribe el cliente para que no pueda meter HTML/enlaces en los correos
@@ -156,26 +187,18 @@ module.exports = async function handler(req, res) {
           </div>`;
 
         // 1. Email a la tienda (Cata)
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'Tienda Pañuelos <onboarding@resend.dev>',
-            to: ['catybarrios@gmail.com'],
-            subject: `🛍️ Nuevo pedido — ${customerName || 'Cliente'} (${fmt(total)})`,
-            html,
-          }),
+        await sendEmail({
+          to: STORE_EMAIL,
+          subject: `🛍️ Nuevo pedido — ${customerName || 'Cliente'} (${fmt(total)})`,
+          html,
         });
 
         // 2. Email de confirmación al comprador
-        if (customerEmail) {
+        if (typeof customerEmail === 'string' && /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(customerEmail.trim())) {
           const customerHtml = `
             <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#333">
               <div style="background:#8B6C42;padding:20px 24px;border-radius:8px 8px 0 0">
-                <h2 style="margin:0;color:#fff;font-size:1.3rem">🎉 ¡Gracias por tu compra!</h2>
+                <h2 style="margin:0;color:#fff;font-size:1.3rem">🎉 ¡Gracias por tu pedido!</h2>
               </div>
               <div style="border:1px solid #e0d6c8;border-top:none;border-radius:0 0 8px 8px;padding:24px">
 
@@ -206,22 +229,14 @@ module.exports = async function handler(req, res) {
                 <p style="margin:0 0 8px;font-size:0.9rem">¿Tienes dudas? Escríbenos por WhatsApp:</p>
                 <a href="https://wa.me/56991593102" style="display:inline-block;background:#25D366;color:white;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600;font-size:0.9rem">💬 WhatsApp +56 9 9159 3102</a>
 
-                <p style="margin:20px 0 0;font-size:0.78rem;color:#999">Este es un comprobante automático. El pago fue gestionado de forma segura a través de MercadoPago.</p>
+                <p style="margin:20px 0 0;font-size:0.78rem;color:#999">Este es un resumen automático de tu pedido. El pago se realiza de forma segura en MercadoPago, que te enviará su propio comprobante cuando se complete.</p>
               </div>
             </div>`;
 
-          await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              from: 'Tienda Pañuelos <onboarding@resend.dev>',
-              to: [customerEmail],
-              subject: `✅ Confirmación de tu pedido — Tienda de Pañuelos`,
-              html: customerHtml,
-            }),
+          await sendEmail({
+            to: customerEmail.trim(),
+            subject: `✅ Confirmación de tu pedido — Tienda de Pañuelos`,
+            html: customerHtml,
           });
         }
       } catch (emailErr) {
