@@ -1,4 +1,6 @@
 // Vercel Serverless Function — crea una preferencia de pago en MercadoPago y notifica por email
+const { PRODUCTS, SHIPPING_OPTIONS, EXTRAS } = require('../catalogo.js');
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -8,14 +10,39 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
   const {
-    items, shippingName, shippingPrice, extras,
+    items: requestedItems, shippingId, giftBag,
     customerName, customerPhone, customerEmail,
     customerAddress, customerComuna, customerCity, customerRegion, customerNotes,
-  } = req.body;
+  } = req.body || {};
+
+  // ── Precios: SIEMPRE desde catalogo.js, nunca desde el navegador ──────
+  // El navegador solo dice qué producto (id) y cuántos (qty). Así nadie puede
+  // cambiar el precio antes de pagar.
+  if (!Array.isArray(requestedItems) || requestedItems.length === 0) {
+    return res.status(400).json({ error: 'El carrito está vacío' });
+  }
+
+  const items = [];
+  for (const reqItem of requestedItems) {
+    const product = PRODUCTS.find(p => p.id === Number(reqItem?.id));
+    const qty = Number(reqItem?.qty);
+    if (!product) return res.status(400).json({ error: 'Producto no válido' });
+    if (!Number.isInteger(qty) || qty < 1 || qty > 50) {
+      return res.status(400).json({ error: 'Cantidad no válida' });
+    }
+    items.push({ name: product.name, qty, price: product.price });
+  }
+
+  const shipping = SHIPPING_OPTIONS.find(s => s.id === shippingId);
+  if (!shipping) return res.status(400).json({ error: 'Forma de despacho no válida' });
+  const shippingName = shipping.name;
+  const shippingPrice = shipping.price;
+
+  const extras = giftBag ? EXTRAS.find(e => e.id === 'giftbag').price : 0;
 
   const preferenceItems = [];
 
-  for (const item of (items || [])) {
+  for (const item of items) {
     preferenceItems.push({
       title: item.name,
       quantity: item.qty,
@@ -26,7 +53,7 @@ module.exports = async function handler(req, res) {
 
   if (shippingPrice > 0) {
     preferenceItems.push({
-      title: shippingName || 'Despacho',
+      title: shippingName,
       quantity: 1,
       unit_price: shippingPrice,
       currency_id: 'CLP',
@@ -77,6 +104,8 @@ module.exports = async function handler(req, res) {
     if (process.env.RESEND_API_KEY) {
       try {
         const fmt = (n) => '$' + Number(n).toLocaleString('es-CL');
+        // Escapa lo que escribe el cliente para que no pueda meter HTML/enlaces en los correos
+        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const total = (items || []).reduce((s, i) => s + i.price * i.qty, 0)
                     + (shippingPrice || 0)
                     + (extras || 0);
@@ -91,7 +120,7 @@ module.exports = async function handler(req, res) {
 
         const addressParts = [customerAddress, customerComuna, customerCity, customerRegion].filter(Boolean);
         const addressLine = addressParts.length
-          ? addressParts.join(', ')
+          ? esc(addressParts.join(', '))
           : '(Retiro en Concepción)';
 
         const html = `
@@ -101,10 +130,10 @@ module.exports = async function handler(req, res) {
             </div>
             <div style="border:1px solid #e0d6c8;border-top:none;border-radius:0 0 8px 8px;padding:24px">
 
-              <p style="margin:0 0 4px"><strong>👤 Cliente:</strong> ${customerName || '—'}</p>
-              <p style="margin:0 0 16px"><strong>📱 Teléfono:</strong> ${customerPhone || '—'}</p>
+              <p style="margin:0 0 4px"><strong>👤 Cliente:</strong> ${esc(customerName) || '—'}</p>
+              <p style="margin:0 0 16px"><strong>📱 Teléfono:</strong> ${esc(customerPhone) || '—'}</p>
               <p style="margin:0 0 16px"><strong>📍 Dirección:</strong> ${addressLine}</p>
-              ${customerNotes ? `<p style="margin:0 0 16px"><strong>📝 Nota:</strong> ${customerNotes}</p>` : ''}
+              ${customerNotes ? `<p style="margin:0 0 16px"><strong>📝 Nota:</strong> ${esc(customerNotes)}</p>` : ''}
 
               <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
                 <thead>
@@ -150,7 +179,7 @@ module.exports = async function handler(req, res) {
               </div>
               <div style="border:1px solid #e0d6c8;border-top:none;border-radius:0 0 8px 8px;padding:24px">
 
-                <p style="margin:0 0 16px">Hola <strong>${customerName || 'cliente'}</strong>, recibimos tu pedido y estamos muy contentos de que hayas elegido <strong>Tienda de Pañuelos</strong>. 🧣</p>
+                <p style="margin:0 0 16px">Hola <strong>${esc(customerName) || 'cliente'}</strong>, recibimos tu pedido y estamos muy contentos de que hayas elegido <strong>Tienda de Pañuelos</strong>. 🧣</p>
 
                 <div style="background:#f5f0ea;border-radius:8px;padding:16px;margin-bottom:16px">
                   <p style="margin:0 0 8px;font-weight:600;color:#8B6C42">📋 Resumen de tu pedido</p>
@@ -171,7 +200,7 @@ module.exports = async function handler(req, res) {
                 </div>
 
                 <p style="margin:0 0 4px"><strong>📍 Dirección:</strong> ${addressLine}</p>
-                ${customerNotes ? `<p style="margin:4px 0 0"><strong>📝 Nota:</strong> ${customerNotes}</p>` : ''}
+                ${customerNotes ? `<p style="margin:4px 0 0"><strong>📝 Nota:</strong> ${esc(customerNotes)}</p>` : ''}
 
                 <hr style="border:none;border-top:1px solid #e0d6c8;margin:20px 0">
                 <p style="margin:0 0 8px;font-size:0.9rem">¿Tienes dudas? Escríbenos por WhatsApp:</p>
