@@ -19,7 +19,7 @@
       --blush: #E8BFB0;
       --dark: #2A1A12;
       --medium: #6B4C3E;
-      --muted: #9B7B6E;
+      --muted: #7D5F53;
       --white: #FFFFFF;
       --border: #E8D5C8;
       --success: #4A7C5F;
@@ -182,6 +182,7 @@
       line-height: 1.7;
     }
     .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .hero-photo { display: none; }
     .btn-primary {
       background: var(--terracotta);
       color: white;
@@ -209,6 +210,43 @@
       gap: 8px;
     }
     .btn-secondary:hover { background: var(--terracotta); color: white; transform: translateY(-2px); }
+    /* Sobre la foto de portada, el botón va en blanco para que se lea */
+    .hero .btn-secondary { color: #fff; border-color: #fff; background: rgba(255,255,255,0.12); }
+    .hero .btn-secondary:hover { background: #fff; color: var(--terracotta); }
+
+    /* Portada en computador: texto a la izquierda y la foto completa a la derecha,
+       para que el texto no tape la cara. En celular se usa la foto de fondo. */
+    @media (min-width: 769px) {
+      .hero {
+        background: var(--ivory);
+        min-height: 600px;
+        padding: 80px 0;
+        display: flex;
+        align-items: center;
+        text-align: left;
+      }
+      .hero-photo {
+        display: block;
+        position: absolute;
+        top: 0; right: 0; bottom: 0;
+        width: 45%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 25%;
+      }
+      .hero-content {
+        margin: 0 0 0 max(40px, calc(50% - 560px));
+        width: calc(55% - 80px);
+        max-width: 560px;
+      }
+      .hero-label { background: rgba(184,92,60,0.1); color: var(--terracotta); }
+      .hero h1 { color: var(--dark); text-shadow: none; }
+      .hero h1 em { color: var(--terracotta); }
+      .hero p { color: var(--medium); margin: 0 0 36px; }
+      .hero-actions { justify-content: flex-start; }
+      .hero .btn-secondary { color: var(--terracotta); border-color: var(--terracotta); background: transparent; }
+      .hero .btn-secondary:hover { background: var(--terracotta); color: #fff; }
+    }
 
     /* ─── Trust Bar ─── */
     .trust-bar {
@@ -240,7 +278,7 @@
     .section-header { text-align: center; margin-bottom: 52px; }
     .section-label {
       display: inline-block;
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -357,13 +395,27 @@
       letter-spacing: 0.05em;
     }
 
+    .product-new {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 3;
+      background: var(--dark);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
     .product-tag {
       position: absolute;
       top: 12px;
       left: 12px;
       padding: 4px 12px;
       border-radius: 50px;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -698,7 +750,7 @@
     .payment-opt input[type=radio] { display: none; }
     .pay-icon { font-size: 1.8rem; margin-bottom: 6px; }
     .pay-label { font-size: 0.82rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
-    .pay-sub { font-size: 0.72rem; color: var(--muted); }
+    .pay-sub { font-size: 0.78rem; color: var(--muted); }
 
     /* Transfer info */
     .transfer-info {
@@ -731,7 +783,7 @@
     .shipping-icon { font-size: 1.5rem; }
     .shipping-details { flex: 1; }
     .shipping-name { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
-    .shipping-desc { font-size: 0.78rem; color: var(--muted); }
+    .shipping-desc { font-size: 0.8rem; color: var(--muted); }
     .shipping-price { font-weight: 700; color: var(--terracotta); font-size: 0.95rem; }
 
     /* Order summary in modal */
@@ -886,6 +938,10 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
 
     /* ─── Responsive ─── */
+    .info-card-prices { list-style: none; margin-top: 10px; font-size: 0.85rem; color: var(--medium); }
+    .info-card-prices li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px dashed var(--border); }
+    .info-card-prices strong { color: var(--terracotta); white-space: nowrap; }
+
     @media (max-width: 768px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
@@ -901,6 +957,16 @@
       .trust-inner { gap: 20px; }
     }
     @media (max-width: 480px) {
+      /* En tarjetas angostas, "Nuevo" va bajo la etiqueta de colección para no taparla */
+      .product-new { top: 44px; left: 12px; right: auto; }
+      /* Encabezado en celular: logo en una línea por palabra y bolsa solo con ícono */
+      .navbar { padding: 0 16px; }
+      .logo { gap: 8px; }
+      .logo img { height: 46px; width: 46px; }
+      .logo-text { font-size: 1.15rem; white-space: nowrap; }
+      .logo-text span { font-size: 0.8rem; }
+      .cart-label { display: none; }
+      .cart-btn { padding: 10px 14px; font-size: 1.1rem; }
       .products-grid { grid-template-columns: 1fr 1fr; }
       section { padding: 52px 16px; }
     }
@@ -921,11 +987,11 @@
       <li><a href="#contacto">Contacto</a></li>
     </ul>
     <div class="nav-right">
-      <button class="cart-btn" onclick="toggleCart()">
-        🛍️ Mi bolsa
+      <button class="cart-btn" onclick="toggleCart()" aria-label="Mi bolsa">
+        🛍️ <span class="cart-label">Mi bolsa</span>
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
-      <button class="hamburger" onclick="toggleMobileMenu()">
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menú">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -942,10 +1008,11 @@
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="inicio">
+  <img class="hero-photo" src="imagenes/portada.jpg" alt="Modelo con pañuelo amarillo de la nueva colección primavera-verano">
   <div class="hero-content">
-    <div class="hero-label">🌸 Chile · Despacho a todo el país</div>
-    <h1>Pañuelos y accesorios que <em>te hacen brillar</em></h1>
-    <p>Dos colecciones únicas para cada estilo. Modelos exclusivos con despacho a todo Chile.</p>
+    <div class="hero-label">🌸 Nueva colección primavera-verano</div>
+    <h1>Tienda de pañuelos <em>y accesorios</em></h1>
+    <p>Nuevos colores, nuevos estilos. Encuentra tu favorito.</p>
     <div class="hero-actions">
       <a href="#catalogo" class="btn-primary">✨ Ver catálogo</a>
       <a href="https://wa.me/56991593102" target="_blank" class="btn-secondary">💬 Escribir por WhatsApp</a>
@@ -1022,8 +1089,12 @@
       </div>
       <div class="info-card">
         <div class="info-card-icon">📦</div>
-        <div class="info-card-title">Despacho a Domicilio</div>
-        <div class="info-card-text">Enviamos a todo Chile por Blue Express. Tu pedido llega cuidadosamente empacado.</div>
+        <div class="info-card-title">Envíos a todo Chile</div>
+        <div class="info-card-text">Por Blue Express, cuidadosamente empacado:</div>
+        <ul class="info-card-prices">
+          <li><span>Retiro en punto Blue Express</span><strong data-precio-despacho="copec"></strong></li>
+          <li><span>A domicilio (3–5 días hábiles)</span><strong data-precio-despacho="courier"></strong></li>
+        </ul>
       </div>
       <div class="info-card">
         <div class="info-card-icon">💳</div>
@@ -1187,9 +1258,12 @@
     COLS.forEach(({ id: col, gridId, tagClass, tagLabel }) => {
       const grid = document.getElementById(gridId);
       if (!grid) return;
-      grid.innerHTML = PRODUCTS.filter(p => p.collection === col).map(p => `
+      // Los productos nuevos (nuevo: true en catalogo.js) aparecen primero
+      const productos = PRODUCTS.filter(p => p.collection === col)
+        .sort((a, b) => (b.nuevo ? 1 : 0) - (a.nuevo ? 1 : 0));
+      grid.innerHTML = productos.map(p => `
         <div class="product-card" id="card-${p.id}">
-          <div class="product-img-wrap${col === 'accesorios' ? ' acc-img' : ''}">
+          <div class="product-img-wrap${col === 'accesorios' && !p.fotoModelo ? ' acc-img' : ''}">
             ${p.image2
               ? `<div id="wrap-${p.id}" style="position:relative;width:100%;height:100%;overflow:hidden"
                      ontouchstart="this.dataset.sx=event.touches[0].clientX"
@@ -1215,6 +1289,7 @@
             <div class="product-tag ${tagClass}">
               ${tagLabel}
             </div>
+            ${p.nuevo ? '<div class="product-new">Nuevo</div>' : ''}
           </div>
           <div class="product-info">
             <div class="product-name">${p.name}</div>
@@ -1760,6 +1835,12 @@
 
   /* ─── INIT ─── */
   renderProducts();
+
+  // Precios de despacho en la sección "Despacho y entrega" (salen de catalogo.js)
+  document.querySelectorAll('[data-precio-despacho]').forEach(el => {
+    const opcion = SHIPPING_OPTIONS.find(s => s.id === el.dataset.precioDespacho);
+    if (opcion) el.textContent = fmtPrice(opcion.price);
+  });
   // Detectar retorno desde MercadoPago
   (function () {
     const params = new URLSearchParams(window.location.search);
