@@ -31,7 +31,6 @@ const PRODUCTS = [
   { id: 26, collection: 'clasica', name: 'Magnolia',      desc: '65×65 cm · Flores blancas y mostaza en gris',  price: 7500, image: 'imagenes/modelo17.jpg', emoji: '🌼', nuevo: true },
   { id: 27, collection: 'clasica', name: 'Atardecer',     desc: '65×65 cm · Acuarela turquesa y naranja',       price: 7500, image: 'imagenes/modelo18.jpg', emoji: '🌅', nuevo: true },
   { id: 7,  collection: 'clasica', name: 'Acuarela',      desc: '65×65 cm · Acuarela pastel',       price: 7500, image: 'imagenes/modelo7.jpg',  image2: 'imagenes/modelo7_2.jpg',  emoji: '🎨' },
-  { id: 8,  collection: 'clasica', name: 'Leopardo',      desc: '65×65 cm · Animal print leopardo', price: 7500, image: 'imagenes/modelo8.jpg',  image2: 'imagenes/modelo8_2.jpg',  emoji: '🐆' },
   { id: 10, collection: 'clasica', name: 'Cielo Azul',    desc: '65×65 cm · Manchas azules',        price: 7500, image: 'imagenes/modelo10.jpg', image2: 'imagenes/modelo10_2.jpg', emoji: '💙' },
   { id: 11, collection: 'clasica', name: 'Cebra',         desc: '65×65 cm · Cebra blanco y negro',  price: 7500, image: 'imagenes/modelo11.jpg', image2: 'imagenes/modelo11_2.jpg', emoji: '🖤' },
   { id: 19, collection: 'clasica', name: 'Cielo Sereno',  desc: '65×65 cm · Azul celeste con bordado',  price: 7500, image: 'imagenes/modelo13.jpg', image2: 'imagenes/modelo13.jpg',   emoji: '🩵' },
